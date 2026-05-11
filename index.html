@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BudgetWise — Smart Financial Planning</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="landing-page">
+  <div class="auth-bg">
+    <div class="auth-orb orb1"></div>
+    <div class="auth-orb orb2"></div>
+    <div class="auth-orb orb3"></div>
+  </div>
+
+  <header class="landing-header">
+    <div class="landing-brand">
+      <div class="brand-icon small">₿</div>
+      <span class="brand-name-sm">BudgetWise</span>
+    </div>
+    <nav class="landing-nav">
+      <a href="app.html#login" class="btn-secondary sm">Login</a>
+      <a href="app.html#register" class="btn-primary sm">Sign Up</a>
+    </nav>
+  </header>
+
+  <main class="landing-main">
+    <section class="landing-hero">
+      <h1 class="landing-title">Master Your Money, Master Your Life.</h1>
+      <p class="landing-subtitle">BudgetWise is the simple, elegant, and powerful tool for taking control of your finances. Plan your budget, track expenses, and build a brighter financial future.</p>
+      <a href="app.html#register" class="btn-generate">
+        Get Started for Free
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </section>
+
+    <section class="features-section">
+      <h2 class="section-title">Everything you need for financial clarity.</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Intuitive Budget Planner</h3>
+          <p>Enter your income, select expense categories, and instantly generate a clear, actionable budget plan.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💡</div>
+          <h3>Smart Financial Advice</h3>
+          <p>Receive personalized tips and warnings based on your budget to improve your savings and spending habits.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💾</div>
+          <h3>Save & Track History</h3>
+          <p>Save every budget plan to your account and review your financial journey over time from your dashboard.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔐</div>
+          <h3>Secure & Private</h3>
+          <p>Your financial data is protected with secure authentication and a commitment to your privacy.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🌐</div>
+          <h3>Multi-Currency Support</h3>
+          <p>Plan your budget in RWF, USD, EUR, KES, and more, with support for major regional currencies.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📱</div>
+          <h3>Works Offline</h3>
+          <p>Use the app in demo mode even without a backend connection, with plans saved locally to your device.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="landing-footer">
+    <p>&copy; 2024 BudgetWise. All rights reserved.</p>
+  </footer>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // Animate title
+        entry.target.querySelector('.section-title')?.style.setProperty('animation-fill-mode', 'forwards');
+
+        // Animate cards with a delay
+        const cards = entry.target.querySelectorAll('.feature-card');
+        cards.forEach((card, index) => {
+          card.style.animation = `fadeInUp 0.5s ease-out forwards`;
+          card.style.animationDelay = `${index * 0.1}s`;
+        });
+        observer.unobserve(entry.target); // Stop observing once animated
+      }
+    });
+  }, { threshold: 0.1 });
+
+  observer.observe(document.querySelector('.features-section'));
+});
+</script>
+</body>
+</html>

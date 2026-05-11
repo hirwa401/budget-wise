@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BudgetWise — Smart Financial Planning</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- AUTH SCREENS -->
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-bg">
+    <div class="auth-orb orb1"></div>
+    <div class="auth-orb orb2"></div>
+    <div class="auth-orb orb3"></div>
+  </div>
+
+  <div class="auth-container">
+    <div class="auth-brand">
+      <div class="brand-icon">₿</div>
+      <h1 class="brand-name">BudgetWise</h1>
+      <p class="brand-tagline">Take control of every franc</p>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="login-panel" class="auth-panel active">
+      <h2>Welcome back</h2>
+      <p class="auth-sub">Sign in to your financial dashboard</p>
+      <div id="login-error" class="auth-error hidden"></div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn-primary" onclick="handleLogin()">
+        <span>Sign In</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+      <p class="auth-switch">Don't have an account? <a href="#" onclick="switchPanel('register')">Create one free</a></p>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="register-panel" class="auth-panel">
+      <h2>Create account</h2>
+      <p class="auth-sub">Start your journey to financial freedom</p>
+      <div id="register-error" class="auth-error hidden"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" id="reg-firstname" placeholder="Jean">
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" id="reg-lastname" placeholder="Mutoni">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="reg-email" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-password" placeholder="Min. 8 characters">
+      </div>
+      <div class="form-group">
+        <label>Profile Picture (optional)</label>
+        <div class="profile-upload">
+          <input type="file" id="profile-pic" accept="image/*" style="display: none;">
+          <button type="button" class="btn-secondary sm" onclick="document.getElementById(&quot;profile-pic&quot;).click()">
+            Upload Photo
+          </button>
+          <img id="preview-pic" class="profile-preview hidden" alt="Preview">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Currency</label>
+        <select id="reg-currency">
+          <option value="RWF">RWF — Rwandan Franc</option>
+          <option value="USD">USD — US Dollar</option>
+          <option value="EUR">EUR — Euro</option>
+          <option value="KES">KES — Kenyan Shilling</option>
+          <option value="UGX">UGX — Ugandan Shilling</option>
+          <option value="TZS">TZS — Tanzanian Shilling</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Country</label>
+        <select id="reg-country">
+          <option value="Rwanda">Rwanda</option>
+          <option value="Kenya">Kenya</option>
+          <option value="Uganda">Uganda</option>
+          <option value="Tanzania">Tanzania</option>
+          <option value="Burundi">Burundi</option>
+          <option value="United States">United States</option>
+          <option value="United Kingdom">United Kingdom</option>
+          <option value="Germany">Germany</option>
+          <option value="France">France</option>
+          <option value="Canada">Canada</option>
+          <option value="Australia">Australia</option>
+        </select>
+      </div>
+      <button class="btn-primary" onclick="handleRegister()">
+        <span>Create Account</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+      <p class="auth-switch">Already have an account? <a href="#" onclick="switchPanel('login')">Sign in</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" class="app hidden">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand-icon small">₿</div>
+      <span class="brand-name-sm">BudgetWise</span>
+    </div>
+    <div class="topbar-center">
+      <nav class="top-nav">
+        <button class="nav-btn active" onclick="showView('dashboard')">Dashboard</button>
+        <button class="nav-btn" onclick="showView('planner')">New Plan</button>
+        <button class="nav-btn" onclick="showView('history')">My Plans</button>
+        <button class="nav-btn" onclick="showView('calculator')">Loan Calculator</button>
+        <button class="nav-btn" onclick="showView('taxcalc')">Tax Calculator</button>
+      </nav>
+    </div>
+    <div class="topbar-right">
+      <button id="theme-toggle" class="btn-secondary sm">Light Mode</button>
+      <div class="user-chip">
+        <img id="topbar-avatar" class="user-avatar-img hidden" alt="Profile">
+        <div class="user-avatar" id="user-avatar">JM</div>
+        <span id="user-name-display">Jean</span>
+      </div>
+      <button class="btn-logout" onclick="handleLogout()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- DASHBOARD VIEW -->
+  <div id="view-dashboard" class="view active">
+    <div class="dashboard-hero">
+      <div class="hero-text">
+        <p class="hero-greeting">Good day, <span id="hero-name">Jean</span> 👋</p>
+        <h2 class="hero-title">Your Financial Overview</h2>
+      </div>
+      <button class="btn-accent" onclick="showView('planner')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Budget Plan
+      </button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <p class="stat-label">Total Plans</p>
+        <p class="stat-value" id="stat-total-plans">0</p>
+        <p class="stat-sub">budgets created</p>
+      </div>
+      <div class="stat-card accent">
+        <p class="stat-label">Latest Budget</p>
+        <p class="stat-value" id="stat-latest-budget">—</p>
+        <p class="stat-sub" id="stat-latest-currency">per month</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Avg. Savings Rate</p>
+        <p class="stat-value" id="stat-savings-rate">—%</p>
+        <p class="stat-sub">across all plans</p>
+      </div>
+    </div>
+
+    <div class="recent-plans-section">
+      <h3>Recent Plans</h3>
+      <div id="recent-plans-list" class="plans-grid">
+        <div class="empty-state">
+          <div class="empty-icon">📊</div>
+          <p>No plans yet. Create your first budget plan!</p>
+          <button class="btn-primary sm" onclick="showView('planner')">Get Started</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLANNER VIEW -->
+  <div id="view-planner" class="view">
+    <div class="planner-layout">
+
+      <!-- SIDEBAR -->
+      <aside class="planner-sidebar">
+        <div class="sidebar-header">
+          <h3>Expense Categories</h3>
+          <p>Select what you typically spend on</p>
+        </div>
+
+        <div class="expense-categories">
+          <div class="category-group">
+            <p class="category-group-label">🏠 Housing</p>
+            <label class="expense-item">
+              <input type="checkbox" value="rent" data-label="Rent/Mortgage"> Rent / Mortgage
+              <input type="number" class="expense-amt" placeholder="Amount" min="0">
+            </label>
+            <label class="expense-item">
+              <input type="checkbox" value="utilities" data-label="Utilities"> Utilities
+              <input type="number" class="expense-amt" placeholder="Amount" min="0">
+            </label>
+            <label class="expense-item">
+              <input type="checkbox" value="internet" data-label="Internet"> Internet
+              <input type="number" class="expense-amt" placeholder="Amount" min="0">
+            </label>
+          </div>
+
+          <div class="category-group">
+            <p class="category-group-label">🍽️ Food</p>
+            <label class="expense-item">
+              <input type="checkbox" value="groceries" data-label="Groceries"> Groceries
+              <input type="number" class="expense-amt" placeholder="Amount" min="0">
+            </label>
+            <label class="expense-item">
+              <input type="checkbox" value="dining" data-label="Dining Out"> Dining Out
+              <input type="number" class="expense-amt" placeholder="Amount" min="0">
+            </label>
+          </div>
+
+          <div class="category-group">
+            <p class="category-group-label">🚗 Transport</p>
+            <label class="expense-item">
+              <input type="checkbox" value="transport" data-label="Transport"> Daily Transport (multiplied by period days)
+              <input type="number" class="expense-amt" placeholder="Amount per day" min="0">
+            </label>
+            <label class="expense-item">
+              <input type="checkbox" value="fuel" data-label="Fuel"> Fuel
+              <input type="number" class="expense-amt" placeholder="Amount" min="0">
+            </label>
+          </div>
+
+          <div class="category-group">
+            <p class="category-group-label">💊 Health</p>
+            <label class="expense-item">
+              <input type="checkbox" value="health" data-label="Health/Medical"> Health / Medical
+              <input type="number" class="expense-amt" placeholder="Amount" min="0">
+            </label>
+            <label class="expense-item">
+              <input type="checkbox" value="gym" data-label="Gym"> Gym / Fitness
+              <input type="number" class="expense-amt" placeholder="Amount" min="0">
+            </label>
+          </div>
+
+          <div class="category-group">
+            <p class="category-group-label">🎮 Lifestyle</p>
+            <label class="expense-item">
+              <input type="checkbox" value="entertainment" data-label="Entertainment"> Entertainment
+              <input type="number" class="expense-amt" placeholder="Amount" min="0">
+            </label>
+            <label class="expense-item">
+              <input type="checkbox" value="clothing" data-label="Clothing"> Clothing
+              <input type="number" class="expense-amt" placeholder="Amount" min="0">
+            </label>
+            <label class="expense-item">
+              <input type="checkbox" value="subscriptions" data-label="Subscriptions"> Subscriptions
+              <input type="number" class="expense-amt" placeholder="Amount" min="0">
+            </label>
+          </div>
+
+          <div class="category-group">
+            <p class="category-group-label">📚 Growth</p>
+            <label class="expense-item">
+              <input type="checkbox" value="education" data-label="Education"> Education
+              <input type="number" class="expense-amt" placeholder="Amount" min="0">
+            </label>
+            <label class="expense-item">
+              <input type="checkbox" value="savings" data-label="Savings"> Savings / Investment
+              <input type="number" class="expense-amt" placeholder="Amount" min="0">
+            </label>
+            <label class="expense-item">
+              <input type="checkbox" value="emergency" data-label="Emergency Fund"> Emergency Fund
+              <input type="number" class="expense-amt" placeholder="Amount" min="0">
+            </label>
+          </div>
+        </div>
+
+        <div class="sidebar-allocation-bar">
+          <div class="alloc-header">
+            <span>Total Allocated</span>
+            <span id="total-amt-display">0</span>
+          </div>
+          <div class="alloc-bar-track">
+            <div class="alloc-bar-fill" id="alloc-bar-fill"></div>
+          </div>
+          <p id="alloc-warning" class="alloc-warning hidden">⚠️ Total exceeds income</p>
+        </div>
+      </aside>
+
+      <!-- PLANNER MAIN -->
+      <main class="planner-main">
+        <div class="planner-header">
+          <h2>Create Budget Plan</h2>
+          <p>Enter your income details and generate a personalized plan</p>
+        </div>
+
+        <div class="plan-inputs">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Plan Name</label>
+              <input type="text" id="plan-name" placeholder="e.g. April 2026 Budget">
+            </div>
+            <div class="form-group">
+              <label>Period</label>
+              <select id="plan-period">
+                <option value="monthly">Monthly</option>
+                <option value="weekly">Weekly</option>
+                <option value="annual">Annual</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Income Type</label>
+              <select id="income-type">
+                <option value="salary">Monthly Salary</option>
+                <option value="freelance">Freelance Income</option>
+                <option value="business">Business Revenue</option>
+                <option value="other">Other Income</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Amount (<span id="currency-label">RWF</span>)</label>
+              <input type="number" id="income-amount" placeholder="e.g. 500000" min="0">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Notes (optional)</label>
+            <textarea id="plan-notes" placeholder="Any notes about this budget period..."></textarea>
+          </div>
+
+          <button class="btn-generate" onclick="generatePlan()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Generate Budget Plan
+          </button>
+        </div>
+
+        <!-- GENERATED PLAN CARD -->
+        <div id="plan-result" class="plan-result hidden">
+          <div class="plan-card">
+            <div class="plan-card-header">
+              <div>
+                <h3 id="result-plan-name">April 2026 Budget</h3>
+                <p id="result-plan-period">Monthly Plan</p>
+              </div>
+              <div class="plan-card-badge">
+                <span id="result-income-display">RWF 500,000</span>
+              </div>
+            </div>
+
+            <div id="plan-breakdown" class="plan-breakdown"></div>
+
+            <div class="plan-summary-row">
+              <div class="summary-item good">
+                <p class="summary-label">Total Expenses</p>
+                <p class="summary-value" id="result-total-expenses">RWF 0</p>
+              </div>
+              <div class="summary-item">
+                <p class="summary-label">Remaining / Savings</p>
+                <p class="summary-value" id="result-remaining">RWF 0</p>
+              </div>
+              <div class="summary-item">
+                <p class="summary-label">Savings Rate</p>
+                <p class="summary-value" id="result-savings-pct">0%</p>
+              </div>
+            </div>
+
+            <div class="plan-advice" id="plan-advice"></div>
+
+            <div class="plan-actions">
+              <button class="btn-save" onclick="savePlan()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Save Plan
+              </button>
+              <button class="btn-secondary" onclick="resetPlanner()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- HISTORY VIEW -->
+  <div id="view-history" class="view">
+    <div class="history-header">
+      <h2>My Budget Plans</h2>
+      <p>All your saved financial plans</p>
+    </div>
+    <div id="history-list" class="plans-grid full">
+      <div class="empty-state">
+        <div class="empty-icon">📁</div>
+        <p>No saved plans yet</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOAN CALCULATOR VIEW -->
+  <div id="view-calculator" class="view">
+    <div class="calculator-header">
+      <h2>Loan Calculator</h2>
+      <p>Calculate loan payments and taxes based on your country</p>
+    </div>
+    <div class="calculator-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Loan Amount (<span id="calc-currency">RWF</span>)</label>
+          <input type="number" id="loan-amount" placeholder="e.g. 1000000" min="0">
+        </div>
+        <div class="form-group">
+          <label>Interest Rate (%)</label>
+          <input type="number" id="interest-rate" placeholder="e.g. 12" min="0" step="0.1">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Loan Term (Years)</label>
+          <input type="number" id="loan-term" placeholder="e.g. 5" min="1">
+        </div>
+        <div class="form-group">
+          <label>Country</label>
+          <select id="calc-country">
+            <option value="Rwanda">Rwanda</option>
+            <option value="Kenya">Kenya</option>
+            <option value="Uganda">Uganda</option>
+            <option value="Tanzania">Tanzania</option>
+            <option value="Burundi">Burundi</option>
+            <option value="United States">United States</option>
+            <option value="United Kingdom">United Kingdom</option>
+            <option value="Germany">Germany</option>
+            <option value="France">France</option>
+            <option value="Canada">Canada</option>
+            <option value="Australia">Australia</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="calculateLoan()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2h-4"/><path d="M9 11V9a3 3 0 0 1 6 0v2"/><path d="M9 11V9a3 3 0 0 1 6 0v2"/></svg>
+        Calculate
+      </button>
+    </div>
+    <div id="calc-result" class="calc-result hidden">
+      <div class="calc-card">
+        <h3>Loan Calculation Results</h3>
+        <div class="calc-breakdown">
+          <div class="calc-item">
+            <span class="calc-label">Monthly Payment:</span>
+            <span class="calc-value" id="monthly-payment">RWF 0</span>
+          </div>
+          <div class="calc-item">
+            <span class="calc-label">Total Payment:</span>
+            <span class="calc-value" id="total-payment">RWF 0</span>
+          </div>
+          <div class="calc-item">
+            <span class="calc-label">Total Interest:</span>
+            <span class="calc-value" id="total-interest">RWF 0</span>
+          </div>
+          <div class="calc-item">
+            <span class="calc-label">Tax Amount (estimated):</span>
+            <span class="calc-value" id="tax-amount">RWF 0</span>
+          </div>
+        </div>
+        <div class="calc-advice" id="calc-advice"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAX CALCULATOR VIEW -->
+  <div id="view-taxcalc" class="view">
+    <div class="taxcalc-header">
+      <h2>Tax Calculator</h2>
+      <p>Calculate your income tax with AI-powered optimization suggestions</p>
+    </div>
+    <div class="taxcalc-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Annual Income (<span id="tax-currency">RWF</span>)</label>
+          <input type="number" id="annual-income" placeholder="e.g. 12000000" min="0">
+        </div>
+        <div class="form-group">
+          <label>Country</label>
+          <select id="tax-country">
+            <option value="Rwanda">Rwanda</option>
+            <option value="Kenya">Kenya</option>
+            <option value="Uganda">Uganda</option>
+            <option value="Tanzania">Tanzania</option>
+            <option value="Burundi">Burundi</option>
+            <option value="United States">United States</option>
+            <option value="United Kingdom">United Kingdom</option>
+            <option value="Germany">Germany</option>
+            <option value="France">France</option>
+            <option value="Canada">Canada</option>
+            <option value="Australia">Australia</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Deductions (<span id="tax-currency-2">RWF</span>)</label>
+          <input type="number" id="deductions" placeholder="e.g. 1000000" min="0">
+        </div>
+        <div class="form-group">
+          <label>Tax Year</label>
+          <select id="tax-year">
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="calculateTax()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2h-4"/><path d="M9 11V9a3 3 0 0 1 6 0v2"/><path d="M9 11V9a3 3 0 0 1 6 0v2"/></svg>
+        Calculate Tax
+      </button>
+    </div>
+    <div id="tax-result" class="tax-result hidden">
+      <div class="tax-card">
+        <h3>Tax Calculation Results</h3>
+        <div class="tax-breakdown">
+          <div class="tax-item">
+            <span class="tax-label">Taxable Income:</span>
+            <span class="tax-value" id="taxable-income">RWF 0</span>
+          </div>
+          <div class="tax-item">
+            <span class="tax-label">Tax Owed:</span>
+            <span class="tax-value" id="tax-owed">RWF 0</span>
+          </div>
+          <div class="tax-item">
+            <span class="tax-label">Effective Tax Rate:</span>
+            <span class="tax-value" id="effective-rate">0%</span>
+          </div>
+          <div class="tax-item">
+            <span class="tax-label">Net Income:</span>
+            <span class="tax-value" id="net-income">RWF 0</span>
+          </div>
+        </div>
+        <div class="tax-brackets" id="tax-brackets"></div>
+        <div class="tax-ai-advice" id="tax-ai-advice"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast hidden"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

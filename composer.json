@@ -1,0 +1,13 @@
+{
+  "name": "budgetwise/backend",
+  "description": "BudgetWise PHP API Backend",
+  "type": "project",
+  "require": {
+    "php": "^7.4 || ^8.0"
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "echo 'PHP backend ready for deployment'"
+    ]
+  }
+}
