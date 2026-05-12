@@ -4,8 +4,10 @@
 ============================================= */
 
 // ─── CONFIG ─────────────────────────────────
-// Change this to your PHP backend URL
-const API_BASE = 'http://localhost/budgetwise/api';
+// Dynamic API base for local and deployed environments
+const API_BASE = window.location.hostname === 'localhost' 
+  ? 'http://localhost/budgetwise/api' 
+  : `https://${window.location.hostname}/api`;
 // ─────────────────────────────────────────────
 
 let currentUser = null;
