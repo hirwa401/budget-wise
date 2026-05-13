@@ -114,35 +114,43 @@
 </div>
 
 <!-- MAIN APP -->
-<div id="app" class="app hidden">
+<div id="app" class="app-layout hidden">
 
-  <!-- TOPBAR -->
-  <header class="topbar">
-    <div class="topbar-left">
+  <!-- APP SIDEBAR -->
+  <aside class="app-sidebar">
+    <div class="sidebar-brand">
       <div class="brand-icon small">₿</div>
       <span class="brand-name-sm">BudgetWise</span>
     </div>
-    <div class="topbar-center">
-      <nav class="top-nav">
-        <button class="nav-btn active" onclick="showView('dashboard')">Dashboard</button>
-        <button class="nav-btn" onclick="showView('planner')">New Plan</button>
-        <button class="nav-btn" onclick="showView('history')">My Plans</button>
-        <button class="nav-btn" onclick="showView('calculator')">Loan Calculator</button>
-        <button class="nav-btn" onclick="showView('taxcalc')">Tax Calculator</button>
-      </nav>
-    </div>
-    <div class="topbar-right">
-      <button id="theme-toggle" class="btn-secondary sm">Light Mode</button>
+    <nav class="app-nav">
+      <a href="#" class="nav-link active" onclick="showView('dashboard')">Dashboard</a>
+      <a href="#" class="nav-link" onclick="showView('planner')">New Plan</a>
+      <a href="#" class="nav-link" onclick="showView('history')">My Plans</a>
+      <a href="#" class="nav-link" onclick="showView('calculator')">Loan Calculator</a>
+      <a href="#" class="nav-link" onclick="showView('taxcalc')">Tax Calculator</a>
+      <a href="#" class="nav-link" onclick="showView('blog')">Blog</a>
+      <a href="#" class="nav-link" onclick="showView('settings')">Settings</a>
+    </nav>
+    <div class="sidebar-footer">
       <div class="user-chip">
         <img id="topbar-avatar" class="user-avatar-img hidden" alt="Profile">
         <div class="user-avatar" id="user-avatar">JM</div>
         <span id="user-name-display">Jean</span>
       </div>
-      <button class="btn-logout" onclick="handleLogout()">
+      <button class="btn-logout" onclick="showView('settings')" title="Settings">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       </button>
     </div>
-  </header>
+  </aside>
+
+  <!-- APP CONTENT -->
+  <main class="app-main">
+    <header class="mobile-app-header">
+      <button id="menu-toggle" class="menu-toggle-btn">
+        <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"></path></svg>
+      </button>
+      <span class="brand-name-sm">BudgetWise</span>
+    </header>
 
   <!-- DASHBOARD VIEW -->
   <div id="view-dashboard" class="view active">
@@ -151,10 +159,6 @@
         <p class="hero-greeting">Good day, <span id="hero-name">Jean</span> 👋</p>
         <h2 class="hero-title">Your Financial Overview</h2>
       </div>
-      <button class="btn-accent" onclick="showView('planner')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        New Budget Plan
-      </button>
     </div>
 
     <div class="stats-grid">
@@ -185,6 +189,10 @@
         </div>
       </div>
     </div>
+    <a href="#" onclick="showView('planner'); return false;" class="add-budget-btn">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>Add</span>
+    </a>
   </div>
 
   <!-- PLANNER VIEW -->
@@ -552,7 +560,149 @@
       </div>
     </div>
   </div>
+  
+   
 
+    <!-- SETTINGS VIEW -->
+    <div id="view-settings" class="view">
+      <div class="settings-layout">
+        <aside class="settings-nav">
+          <h3 class="settings-nav-header">Settings</h3>
+          <a href="#" class="settings-nav-link active" data-pane="account">Account Center</a>
+          <a href="#" class="settings-nav-link" data-pane="security">Password & Security</a>
+          <a href="#" class="settings-nav-link" data-pane="appearance">Appearance</a>
+          <a href="#" class="settings-nav-link" data-pane="plans">Plan Management</a>
+          <a href="#" class="settings-nav-link" data-pane="subscription">Subscription</a>
+        </aside>
+        <main class="settings-content">
+          <!-- Account Pane -->
+          <div class="settings-pane active" id="pane-account">
+            <div class="settings-pane-header">
+              <h3>Account Center</h3>
+              <p>Manage your personal information.</p>
+            </div>
+            <div class="settings-card">
+              <div id="account-update-error" class="auth-error hidden"></div>
+              <div id="account-update-success" class="auth-success hidden"></div>
+              <div class="form-group">
+                <label>First Name</label>
+                <input type="text" id="setting-firstname" placeholder="First Name">
+              </div>
+              <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" id="setting-lastname" placeholder="Last Name">
+              </div>
+              <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="setting-email" placeholder="Email" readonly>
+              </div>
+              <button class="btn-primary" onclick="updateProfile()">Update Profile</button>
+            </div>
+          </div>
+          <!-- Security Pane -->
+          <div class="settings-pane" id="pane-security">
+            <div class="settings-pane-header">
+              <h3>Password & Security</h3>
+              <p>Change your password and manage account security.</p>
+            </div>
+            <div class="settings-card">
+              <div id="password-change-error" class="auth-error hidden"></div>
+              <div id="password-change-success" class="auth-success hidden"></div>
+              <div id="password-request-form">
+                <p class="settings-card-desc">A verification code will be sent to your email address to reset your password.</p>
+                <button class="btn-secondary" onclick="requestPasswordChange()">Send Verification Code</button>
+              </div>
+              <div id="password-reset-form" class="hidden">
+                <div class="form-group">
+                  <label>Verification Code</label>
+                  <input type="text" id="setting-code" placeholder="Enter code from email">
+                </div>
+                <div class="form-group">
+                  <label>New Password</label>
+                  <input type="password" id="setting-new-password" placeholder="Min. 8 characters">
+                </div>
+                <button class="btn-primary" onclick="handlePasswordReset()">Set New Password</button>
+              </div>
+            </div>
+          </div>
+          <!-- Appearance Pane -->
+          <div class="settings-pane" id="pane-appearance">
+            <div class="settings-pane-header">
+              <h3>Appearance</h3>
+              <p>Customize the look and feel of the application.</p>
+            </div>
+            <div class="settings-card">
+              <p class="settings-card-desc">Choose your preferred interface theme.</p>
+              <div class="theme-selector">
+                <button id="theme-light-btn" class="theme-btn" onclick="applyTheme('light')">
+                  <div class="theme-preview light"></div>
+                  Light
+                </button>
+                <button id="theme-dark-btn" class="theme-btn" onclick="applyTheme('dark')">
+                  <div class="theme-preview dark"></div>
+                  Dark
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Plan Management Pane -->
+          <div class="settings-pane" id="pane-plans">
+            <div class="settings-pane-header">
+              <h3>Plan Management</h3>
+              <p>Manage your saved budget plans.</p>
+            </div>
+            <div class="settings-card">
+              <div class="settings-actions">
+                <button class="btn-secondary" onclick="showView('history')">View All Plans</button>
+                <button class="btn-danger" onclick="clearAllPlans()">Clear All Local Plans</button>
+              </div>
+            </div>
+            <div class="settings-card">
+                <h3>Session</h3>
+                <p class="settings-card-desc">End your current session and log out.</p>
+                <button class="btn-danger" onclick="handleLogout()">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                  Logout
+                </button>
+            </div>
+          </div>
+          <!-- Subscription Pane -->
+          <div class="settings-pane" id="pane-subscription">
+            <div class="settings-pane-header">
+              <h3>Subscription</h3>
+              <p>Manage your subscription plan and billing.</p>
+            </div>
+            <div class="pricing-grid settings-pricing">
+              <div class="pricing-card">
+                <h3>Individual</h3>
+                <p class="price">Free</p>
+                <p class="price-desc">For personal budgeting and tracking.</p>
+                <ul>
+                  <li>Unlimited Budgets</li>
+                  <li>Expense Tracking</li>
+                  <li>Smart Insights</li>
+                  <li>Standard Support</li>
+                </ul>
+                <button class="btn-secondary" disabled>Current Plan</button>
+              </div>
+              <div class="pricing-card featured">
+                <h3>For Couples</h3>
+                <p class="price">$5 <span class="price-period">/ month</span></p>
+                <p class="price-desc">For collaborative household budgeting.</p>
+                <ul>
+                  <li>All Individual Features</li>
+                  <li>Shared Budgets</li>
+                  <li>Joint Expense Tracking</li>
+                  <li>Priority Support</li>
+                </ul>
+                <a href="#" class="btn-primary">Choose Couples Plan</a>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </main>
 </div>
 
 <!-- TOAST -->

@@ -59,23 +59,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('income-amount')?.addEventListener('input', updateAllocationBar);
 
+  const menuToggle = document.getElementById('menu-toggle');
+  const sidebar = document.querySelector('.app-sidebar');
+  menuToggle?.addEventListener('click', () => {
+    sidebar?.classList.toggle('open');
+  });
+
   initTheme();
 });
 
 function initTheme() {
   const saved = localStorage.getItem('bw_theme') || 'dark';
   applyTheme(saved);
-  const toggle = document.getElementById('theme-toggle');
-  if (toggle) {
-    toggle.addEventListener('click', () => {
-      const next = document.body.classList.contains('light-theme') ? 'dark' : 'light';
-      applyTheme(next);
-      localStorage.setItem('bw_theme', next);
-    });
-  }
 }
 
 function applyTheme(theme) {
+  localStorage.setItem('bw_theme', theme);
   if (theme === 'light') {
     document.body.classList.add('light-theme');
     document.body.classList.remove('dark-theme');
@@ -89,6 +88,9 @@ function applyTheme(theme) {
       btn.textContent = 'Light Mode';
     });
   }
+  // Update active button in settings
+  document.getElementById('theme-light-btn')?.classList.toggle('active', theme === 'light');
+  document.getElementById('theme-dark-btn')?.classList.toggle('active', theme === 'dark');
 }
 
 // =============================================
@@ -201,8 +203,8 @@ function generateUserIdFromEmail(email) {
 }
 
 function handleLogout() {
-  // Clear current user's plans from localStorage
-  if (currentUser?.id) {
+  // Clear current user's plans from localStorage if it's a demo user
+  if (currentUser?.id && typeof currentUser.id === 'number') {
     localStorage.removeItem('bw_plans_' + currentUser.id);
   }
   currentUser = null;
@@ -216,8 +218,8 @@ function handleLogout() {
 // APP BOOT
 // =============================================
 function bootApp() {
-  document.getElementById('auth-screen').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('auth-screen')?.classList.add('hidden');
+  document.getElementById('app')?.classList.remove('hidden');
 
   const name = currentUser.firstname || currentUser.email?.split('@')[0] || 'User';
   document.getElementById('user-name-display').textContent = name;
@@ -254,20 +256,20 @@ function bootApp() {
 // VIEWS
 // =============================================
 function showView(name) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.app-main .view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.app-nav .nav-link').forEach(b => b.classList.remove('active'));
 
   document.getElementById('view-' + name)?.classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(b => {
-    if (b.textContent.toLowerCase().includes(name === 'dashboard' ? 'dash' : name === 'planner' ? 'new' : name === 'history' ? 'my' : name === 'calculator' ? 'loan' : name === 'taxcalc' ? 'tax' : name)) {
+  document.querySelectorAll('.app-nav .nav-link').forEach(b => {
+    if (b.onclick.toString().includes(`showView('${name}')`)) {
       b.classList.add('active');
     }
   });
-
   if (name === 'history') loadHistory();
   if (name === 'dashboard') loadDashboard();
   if (name === 'calculator') initCalculator();
   if (name === 'taxcalc') initTaxCalculator();
+  if (name === 'settings') loadSettings();
 }
 
 // =============================================
@@ -857,6 +859,130 @@ function generateTaxAdvice(income, deductions, taxOwed, effectiveRate, country) 
 }
 
 // =============================================
+// SETTINGS
+// =============================================
+function loadSettings() {
+  if (!currentUser) return;
+  document.getElementById('setting-firstname').value = currentUser.firstname || '';
+  document.getElementById('setting-lastname').value = currentUser.lastname || '';
+  document.getElementById('setting-email').value = currentUser.email || '';
+
+  // Reset password forms
+  document.getElementById('password-request-form').classList.remove('hidden');
+  document.getElementById('password-reset-form').classList.add('hidden');
+  document.getElementById('password-change-error').classList.add('hidden');
+  document.getElementById('password-change-success').classList.add('hidden');
+  document.getElementById('account-update-error').classList.add('hidden');
+  document.getElementById('account-update-success').classList.add('hidden');
+
+  // Set active theme button
+  const currentTheme = localStorage.getItem('bw_theme') || 'dark';
+  applyTheme(currentTheme);
+
+  // Add event listeners for settings navigation
+  const settingsNavLinks = document.querySelectorAll('.settings-nav-link');
+  settingsNavLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const paneId = link.dataset.pane;
+      document.querySelectorAll('.settings-pane').forEach(p => p.classList.remove('active'));
+      document.getElementById(`pane-${paneId}`).classList.add('active');
+      settingsNavLinks.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+    });
+  });
+
+  // Handle settings profile picture upload
+  const settingsProfileInput = document.getElementById('settings-profile-pic-input');
+  settingsProfileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        profilePicData = event.target.result; // Store new pic data
+        document.getElementById('settings-avatar-img').src = profilePicData;
+        document.getElementById('settings-avatar-img').classList.remove('hidden');
+        document.getElementById('settings-avatar-initials').classList.add('hidden');
+        showToast('New profile picture selected. Click "Update Profile" to save.', 'success');
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+async function updateProfile() {
+  const firstname = document.getElementById('setting-firstname').value.trim();
+  const lastname = document.getElementById('setting-lastname').value.trim();
+  const errEl = document.getElementById('account-update-error');
+  const successEl = document.getElementById('account-update-success');
+
+  // If no new picture was selected, keep the old one
+  const newProfilePic = profilePicData || currentUser.profile_pic;
+
+  // NOTE: Backend API endpoint for this is not yet created.
+  // This will work in demo mode.
+  try {
+    // const res = await apiFetch('/user/update.php', { id: currentUser.id, firstname, lastname });
+    // if (res.success) {
+      currentUser.firstname = firstname;
+      currentUser.lastname = lastname;
+      currentUser.profile_pic = newProfilePic;
+      sessionStorage.setItem('bw_user', JSON.stringify(currentUser));
+      bootApp(); // Re-render user info
+      showEl(successEl, 'Profile updated successfully!');
+    // } else {
+    //   showError(errEl, res.message);
+    // }
+  } catch (e) {
+    // Demo mode
+    currentUser.firstname = firstname;
+    currentUser.lastname = lastname;
+    currentUser.profile_pic = newProfilePic;
+    sessionStorage.setItem('bw_user', JSON.stringify(currentUser));
+    bootApp();
+    showEl(successEl, 'Profile updated in demo mode.');
+  }
+  profilePicData = null; // Reset after update
+}
+
+async function requestPasswordChange() {
+  const errEl = document.getElementById('password-change-error');
+  const successEl = document.getElementById('password-change-success');
+  // NOTE: Backend API for sending email is required.
+  // This is a placeholder.
+  try {
+    // const res = await apiFetch('/auth/request-reset.php', { email: currentUser.email });
+    // if (res.success) {
+      showEl(successEl, 'Verification code sent to your email.');
+      document.getElementById('password-request-form').classList.add('hidden');
+      document.getElementById('password-reset-form').classList.remove('hidden');
+    // } else {
+    //   showError(errEl, res.message);
+    // }
+  } catch (e) {
+    showError(errEl, 'This feature requires a server connection.');
+  }
+}
+
+async function handlePasswordReset() {
+  const code = document.getElementById('setting-code').value.trim();
+  const newPassword = document.getElementById('setting-new-password').value;
+  const errEl = document.getElementById('password-change-error');
+  const successEl = document.getElementById('password-change-success');
+
+  // NOTE: Backend API for password reset is required.
+  showError(errEl, 'This feature is not yet connected to the backend.');
+}
+
+function clearAllPlans() {
+  if (confirm('Are you sure you want to delete all locally saved plans? This cannot be undone.')) {
+    localStorage.removeItem('bw_plans_' + (currentUser?.id || 'demo'));
+    showToast('All local plans have been cleared.', 'success');
+    loadDashboard();
+  }
+}
+
+// =============================================
 // API HELPER
 // =============================================
 async function apiFetch(path, body = {}) {
@@ -886,6 +1012,11 @@ function capitalize(str) {
 }
 
 function showError(el, msg) {
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+function showEl(el, msg) {
   el.textContent = msg;
   el.classList.remove('hidden');
 }
